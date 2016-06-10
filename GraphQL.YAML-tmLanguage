@@ -1,0 +1,129 @@
+# [PackageDev] target_format: plist, ext: tmLanguage
+name: GraphQL
+scopeName: source.graphql
+fileTypes: [graphql, GraphQL]
+
+patterns:
+- include: '#comment'
+
+- comment: a fragment definintion
+  name: meta.fragment
+  match: (fragment)\s*([_A-Za-z][_0-9A-Za-z]*)\s*(on)\s*([_A-Za-z][_0-9A-Za-z]*)
+  captures:
+    '1': {name: storage.type}
+    '2': {name: variable.other}
+    '3': {name: keyword.operator}
+    '4': {name: support.constant}
+
+- comment: an operation definition
+  name: meta.operation
+  match: (query|mutation)\s*([_A-Za-z][_0-9A-Za-z]*)
+  captures:
+    '1': {name: storage.type}
+    '2': {name: variable.other}
+
+- include: '#arguments'
+
+- include: '#selections'
+
+repository:
+  comment:
+    name: comment.line.number-sign.graphql
+    match: '#.*$'
+
+  argument:
+    name: variable.parameter
+    match: '[_A-Za-z][_0-9A-Za-z]*:'
+
+  arguments:
+    name: meta.arguments
+    begin: \(
+    beginCaptures:
+      '0': {name: meta.brace.round.graphql}
+    end: \)
+    endCaptures:
+      '0': {name: meta.brace.round.graphql}
+    patterns:
+    - include: '#argument'
+    - include: '#string'
+    - include: '#boolean'
+    - include: '#variable'
+    - include: '#number'
+    - include: '#enum'
+    - include: '#comment'
+
+  boolean:
+    name: constant.language.boolean
+    match: true|false
+
+  builtInField:
+    name: keyword.other.graphql
+    match: __schema|__typename|__type
+
+  directive:
+    name: storage.modifier
+    match: '@[a-z]+'
+
+  enum:
+    name: support.constant.enum
+    match: '[_A-Za-z][_0-9A-Za-z]*'
+
+  escapedChar:
+    name: constant.character.escape.graphql
+    match: \\(?:u[\da-fA-f]{4}|.)
+
+  fieldAlias:
+    name: variable.other.alias.graphql
+    match: '[_A-Za-z][_0-9A-Za-z]*:'
+
+  fragmentSpread:
+    match: (\.\.\.)\s*([_A-Za-z][_0-9A-Za-z]*)\s*(on)?
+    captures:
+      '1': {name: keyword.operator}
+      '2': {name: variable.other}
+
+  inlineFragment:
+    match: (\.\.\.)\s*(on)\s*([_A-Za-z][_0-9A-Za-z]*)
+    captures:
+      '1': {name: keyword.operator}
+      '2': {name: keyword.operator}
+      '3': {name: support.constant}
+
+  number:
+    name: constant.numeric
+    match: \d+\.?\d*[eE]?[\+\-]?\d*
+
+  selections:
+    name: meta.selections
+    begin: \{
+    beginCaptures:
+      '0': {name: meta.brace.curly.graphql}
+    end: \}
+    endCaptures:
+      '0': {name: meta.brace.curly.graphql}
+    patterns:
+    - include: '#fieldAlias'
+    - include: '#inlineFragment'
+    - include: '#fragmentSpread'
+    - include: '#directive'
+    - include: '#arguments'
+    - include: '#comment'
+    - include: '#selections'
+    - include: '#builtInField'
+
+  string:
+    name: string.quoted.double
+    begin: '"'
+    beginCaptures:
+      '0': {name: punctuation.definition.string.begin}
+    end: '"'
+    endCaptures:
+      '0': {name: punctuation.definition.string.end}
+    patterns:
+    - include: '#escapedChar'
+
+  variable:
+    name: constant.other.symbol
+    match: \$[_A-Za-z][_0-9A-Za-z]*
+foldingStartMarker: '{(['
+foldingStopMarker: '})]'
